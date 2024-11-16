@@ -71,6 +71,7 @@ const App = () => {
   return (
     <div className="App flex flex-col items-center p-4 bg-gray-100 min-h-screen">
       <Header />
+
       <EarthquakeFilter
         setMinMagnitude={setMinMagnitude}
         setDateRange={setDateRange}
@@ -80,6 +81,7 @@ const App = () => {
         mapView={mapView}
         setMapView={setMapView}
       />
+
       {loading ? (
         <div className="flex justify-center items-center mt-10">
           <div className="w-16 h-16 border-4 border-gray-300 border-t-blue-500 rounded-full animate-spin"></div>
@@ -88,36 +90,49 @@ const App = () => {
           </div>
         </div>
       ) : (
-        <MapContainer
-          center={[20, 0]}
-          zoom={2}
-          scrollWheelZoom={true}
-          className="h-[75vh] w-full rounded-lg shadow-lg border border-gray-300"
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution="&copy; OpenStreetMap contributors"
-          />
-          <MapComponent
-            earthquakes={filteredEarthquakes}
-            mapView={mapView}
-            handleMarkerClick={handleMarkerClick}
-          />
-        </MapContainer>
+        <div className="flex flex-col gap-6 mt-10 w-full">
+          <div className="flex-1 flex flex-col">
+            <h2 className="text-xl font-semibold text-center mb-4">
+              Earthquake Map
+            </h2>
+            <MapContainer
+              center={[20, 0]}
+              zoom={2}
+              scrollWheelZoom={true}
+              className="h-[50vh] lg:h-[75vh] w-full rounded-lg shadow-lg border border-gray-300"
+            >
+              <TileLayer
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                attribution="&copy; OpenStreetMap contributors"
+              />
+              <MapComponent
+                earthquakes={filteredEarthquakes}
+                mapView={mapView}
+                handleMarkerClick={handleMarkerClick}
+              />
+            </MapContainer>
+          </div>
+
+          <div className="flex-1 flex flex-col border border-gray-300 rounded-lg px-3">
+            <Graph
+              data={filteredEarthquakes.map((eq) => ({
+                location: eq.properties.place || "Unknown",
+                magnitude: eq.properties.mag,
+                time: new Date(eq.properties.time).toLocaleString(),
+              }))}
+              className="h-[50vh] lg:h-[75vh] w-full rounded-lg shadow-lg border border-gray-300"
+            />
+          </div>
+        </div>
       )}
+
       {selectedEarthquake && (
         <EarthquakeDetails
           selectedEarthquake={selectedEarthquake}
           closeDetails={closeDetails}
         />
       )}
-      <Graph
-        data={filteredEarthquakes.map((eq) => ({
-          location: eq.properties["place"],
-          magnitude: eq.properties["mag"],
-          time: eq.properties["time"],
-        }))}
-      />
+
       <Footer />
     </div>
   );
